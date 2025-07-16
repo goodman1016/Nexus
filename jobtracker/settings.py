@@ -39,7 +39,7 @@ if not any(ALLOWED_HOSTS):
 X_FRAME_OPTIONS = 'ALLOWALL'
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://amazingjobtracker.vercel.app',
+    'https://nexus-euv2.onrender.com/',
     'http://127.0.0.1:8000',
 ]
 
