@@ -1,0 +1,557 @@
+C, 60
+C++, 70
+C#, 90
+Java, 100
+Kotlin, 80
+Scala, 70
+Swift, 80
+Dart, 60
+Rust, 75
+Go, 80
+PHP, 60
+Ruby, 65
+Python, 95
+TypeScript, 90
+JavaScript, 90
+HTML, 80
+CSS, 80
+SQL, 90
+Bash/Shell, 75
+Assembly, 50
+Haskell, 60
+R, 70
+Elixir, 60
+Perl, 50
+Lua, 50
+VB.NET, 60
+Objective-C, 65
+Apex, 50
+Julia, 60
+F#, 65
+OCaml, 50
+Lisp, 50
+Prolog, 50
+COBOL, 40
+Groovy, 60
+APL, 40
+Raku, 40
+.NET, 90
+ASP.NET, 85
+Razor, 70
+WinForms, 60
+WPF, 65
+Node.js, 85
+Express, 85
+Fastify, 75
+NestJS, 80
+Django, 85
+Flask, 80
+Laravel, 75
+Symfony, 70
+Ruby on Rails, 75
+Spring Boot, 90
+Spring Framework, 90
+Micronaut, 75
+Quarkus, 70
+Ktor, 70
+Play Framework, 65
+Angular, 85
+AngularJS, 75
+React, 95
+React Native, 85
+Vue.js, 85
+Svelte, 80
+Nuxt.js, 80
+Solid.js, 75
+Ember.js, 60
+Blazor, 65
+Uno Platform, 60
+Xamarin, 75
+Flutter, 85
+Ionic, 75
+Capacitor, 70
+GTK, 50
+Qt, 55
+SwiftUI, 80
+Web APIs, 90
+GraphQL, 85
+REST, 90
+gRPC, 80
+OAuth, 80
+OpenID Connect, 75
+AWS, 95
+Azure, 95
+Google Cloud, 95
+Oracle Cloud Infrastructure, 80
+Firebase, 75
+Supabase, 70
+Heroku, 65
+DigitalOcean, 70
+Linode, 60
+Vercel, 70
+Render, 70
+Netlify, 70
+Docker, 90
+Kubernetes, 90
+Podman, 75
+Terraform, 85
+Pulumi, 75
+Ansible, 85
+Puppet, 75
+Chef, 75
+Jenkins, 85
+GitLab, 80
+GitHub, 90
+Azure DevOps, 85
+TFS, 70
+CI/CD Pipelines, 90
+MSBuild, 70
+Maven, 70
+Gradle, 75
+Webpack, 80
+Yarn, 75
+npm, 80
+pnpm, 75
+NuGet, 75
+PostgreSQL, 90
+MySQL, 85
+Microsoft SQL Server, 90
+SQLite, 80
+MongoDB, 85
+Cassandra, 75
+Couchbase, 75
+CouchDB, 70
+Redis, 85
+Neo4j, 75
+RavenDB, 70
+TiDB, 65
+Clickhouse, 75
+Redshift, 80
+H2, 60
+Firebird, 55
+Oracle DB, 85
+IBM DB2, 70
+MariaDB, 75
+DynamoDB, 85
+DuckDB, 75
+BigQuery, 85
+TensorFlow, 95
+PyTorch, 95
+Keras, 90
+Hugging Face Transformers, 95
+Scikit-Learn, 90
+Pandas, 90
+NumPy, 90
+OpenCV, 85
+Pyspark, 80
+Apache Kafka, 85
+Kafka Connect, 80
+Apache Spark, 90
+Apache Airflow, 85
+Apache Beam, 80
+Copilot, 75
+Codeium, 75
+Replit Ghostwriter, 75
+Tabnine, 75
+Rubber Duck.AI, 70
+Ghostwriter, 75
+ChatGPT, 100
+Bing AI, 85
+Perplexity AI, 75
+You.com, 75
+Neeva AI, 70
+Unit Testing, 90
+Integration Testing, 90
+Test-driven development, 90
+Automated Testing, 90
+Google Test, 80
+doctest, 75
+Catch2, 75
+Boost.Test, 75
+cppunit, 75
+pytest, 90
+unittest, 85
+Microservices, 90
+SOA, 80
+Event-driven architecture, 85
+Serverless, 85
+Domain-driven design, 85
+Saga Pattern, 75
+CI/CD, 90
+Software architecture, 90
+Design patterns, 85
+Scalable software, 85
+Maintainable software, 85
+API design, 90
+System integration, 85
+Authentication, 90
+Authorization, 90
+DevOps, 90
+Visual Studio, 85
+VS Code, 90
+JetBrains IDEs, 85
+Android Studio, 75
+Xcode, 75
+NetBeans, 70
+Eclipse, 75
+IntelliJ IDEA, 85
+BBEdit, 60
+Sublime Text, 70
+Atom, 70
+Neovim, 60
+Vim, 60
+Emacs, 60
+Geany, 50
+Notepad++, 60
+Code::Blocks, 60
+Kate, 60
+TextMate, 60
+Git, 90
+Bitbucket, 80
+Swagger, 85
+Postman, 85
+SQL Server Management Studio, 80
+PowerShell, 75
+Command-line tools, 75
+AEM, 60
+Adobe Launch, 60
+Adobe Target, 60
+Adobe Analytics, 60
+JSON, 85
+XML, 75
+Markdown, 75
+WordPress, 75
+Drupal, 70
+ETL processes, 80
+SSIS, 75
+SSRS, 70
+Infrastructure, 85
+Container orchestration, 90
+Legacy system modernization, 75
+Tauri, 60
+Electron, 75
+Code documentation, 85
+Developer portals, 70
+Communication skills, 85
+Team collaboration, 85
+Problem-solving, 90
+Adaptability, 80
+Time management, 80
+Leadership, 90
+Technical guidance, 85
+Mentorship, 85
+Coaching, 80
+Training, 80
+Solution-oriented mindset, 85
+Self-motivated, 80
+Self-starter, 80
+Detail-oriented, 85
+Stakeholder collaboration, 85
+Planning, 85
+Estimating, 80
+Scheduling, 75
+Knowledge sharing, 85
+QA collaboration, 80
+Agile methodologies, 90
+Scrum, 85
+Globally distributed team collaboration, 75
+Lifelong learning, 85
+Professional development, 80
+Diversity, 75
+Belonging, 75
+Autonomy, 80
+End-to-end ownership, 85
+Proposal skills, 70
+Customer requirements understanding, 80
+Cross-functional collaboration, 85
+SDLC understanding, 85
+Iterative development, 85
+Critical thinking, 90
+Prioritization, 85
+Initiative, 85
+Flexibility, 80
+Documentation skills, 80
+Clarity in communication, 85
+Web Services, 80
+PL/SQL, 75
+Software Design, 85
+Software Development, 90
+Code Review, 85
+Technical Documentation, 85
+Troubleshooting, 85
+Application Deployment, 85
+Collaboration, 85
+Innovation, 85
+Cross-functional Teamwork, 85
+Requirements Gathering, 80
+Requirement Analysis, 80
+Constructive Feedback, 80
+Continuous Improvement, 85
+Time Management, 85
+Quality Assurance, 85
+Adherence to Timelines, 80
+Initiative, 85
+Agile, 90
+Agile Environment, 85
+Application, 75
+Architectures, 80
+Assist, 75
+Balancing, 75
+Clear, 75
+Clean, 80
+Cloud, 85
+Code, 90
+Communicating, 85
+Coordinating, 75
+Databases, 85
+Designing, 80
+Development, 90
+Development Work, 85
+Distributed Systems, 85
+Documentation, 85
+Domain Area, 75
+Engineer, 75
+Environment, 75
+Frameworks, 85
+Full Cycle, 80
+High Availability, 85
+Implementation, 85
+Implementing Solutions, 85
+Inspire, 75
+Languages, 75
+Leading, 80
+Mentor, 85
+Microservice, 90
+Mobile, 85
+Mobile Application, 85
+Product, 85
+Product Line, 75
+Proposals, 75
+Protocols, 75
+Relational Databases, 85
+Responsibilities, 75
+Services, 85
+Software, 90
+Systems, 85
+Teams, 85
+Technical, 90
+Technical Execution, 85
+Technology, 85
+Testing, 85
+Thorough, 80
+Write, 80
+Golang, 85
+Bash, 75
+Shell Scripting, 75
+MATLAB, 65
+HTML5, 80
+CSS3, 80
+Sass, 75
+Less, 75
+React.js, 90
+Next.js, 85
+Redux, 90
+jQuery, 70
+Tailwind CSS, 80
+Bootstrap, 75
+Express.js, 85
+.NET Core, 90
+RESTful APIs, 90
+WebSockets, 75
+Oracle Database, 85
+Aerospike, 60
+ElasticSearch, 75
+Snowflake, 75
+GitHub Actions, 80
+GitLab CI/CD, 75
+CircleCI, 75
+Travis CI, 75
+Helm, 80
+AWS CloudFormation, 85
+AWS Cloud Development Kit, 85
+AWS Elastic Compute Cloud, 90
+AWS Lambda, 90
+Amazon Simple Storage Service, 90
+Amazon Relational Database Service, 90
+Amazon DynamoDB, 90
+Amazon API Gateway, 90
+Amazon CloudFront, 80
+Amazon Simple Queue Service, 80
+Amazon Simple Notification Service, 80
+Amazon Elastic Kubernetes Service, 90
+Amazon Elastic Container Service, 90
+Amazon SageMaker, 90
+AWS Identity and Access Management, 85
+AWS CodePipeline, 85
+AWS CodeBuild, 85
+AWS CodeDeploy, 85
+Amazon Redshift, 80
+Amazon Aurora, 80
+AWS Step Functions, 80
+AWS Glue, 75
+AWS Batch, 75
+Amazon ElastiCache, 75
+AWS CloudWatch, 80
+AWS X-Ray, 75
+Azure Virtual Machines, 85
+Azure Functions, 85
+Azure Blob Storage, 80
+Azure SQL Database, 85
+Azure Cosmos DB, 85
+Azure Service Bus, 75
+Azure Kubernetes Service, 85
+Azure API Management, 80
+Azure Active Directory, 80
+Azure App Service, 85
+Azure Pipelines, 85
+Azure Monitor, 80
+Azure Key Vault, 80
+Azure Logic Apps, 75
+Azure Event Grid, 75
+Azure Event Hubs, 75
+Azure Synapse Analytics, 75
+Azure Cognitive Services, 80
+Azure Machine Learning, 80
+Google Compute Engine, 85
+Google App Engine, 80
+Google Cloud Functions, 85
+Google Cloud Storage, 85
+Google BigQuery, 85
+Google Kubernetes Engine, 85
+Google Cloud Pub/Sub, 75
+Google Cloud Spanner, 75
+Google Cloud Run, 85
+Google Cloud Firestore, 75
+Google Cloud SQL, 85
+Google Cloud Vision AI, 80
+Google Cloud Natural Language API, 75
+Google Cloud IAM, 75
+Google Cloud Logging, 75
+Google Cloud Monitoring, 75
+Vertex AI, 80
+Google Dataflow, 75
+Google Dataproc, 75
+Google Cloud Composer, 75
+Machine Learning, 90
+Deep Learning, 90
+Natural Language Processing, 90
+Computer Vision, 85
+Hugging Face, 95
+Transformers, 95
+LangChain, 90
+XGBoost, 85
+LightGBM, 85
+Matplotlib, 85
+Seaborn, 80
+Jupyter, 85
+DVC, 80
+MLOps, 85
+Data Engineering, 90
+JUnit, 80
+TestNG, 75
+NUnit, 75
+Selenium, 80
+Cypress, 75
+Playwright, 75
+Jest, 85
+Mocha, 75
+Chai, 75
+TestContainers, 75
+Cucumber, 75
+LoadRunner, 70
+Apache JMeter, 75
+Prometheus, 75
+Grafana, 75
+Datadog, 75
+Splunk, 75
+New Relic, 75
+Sentry, 75
+ELK Stack, 75
+CloudWatch, 80
+Visual Studio Code, 85
+Jira, 80
+Confluence, 75
+Notion, 75
+Figma, 75
+Docker Desktop, 75
+Kubernetes Dashboard, 75
+Kanban, 75
+Test Driven Development, 85
+Behavior Driven Development, 75
+Continuous Integration, 90
+Continuous Delivery, 90
+Site Reliability Engineering, 80
+Software Development Life Cycle, 85
+SOLID Principles, 90
+Clean Architecture, 85
+Domain Driven Design, 85
+Hexagonal Architecture, 80
+SIEM, 75
+IDS, 75
+IPS, 75
+PKI, 75
+TLS, 75
+SSH, 75
+IAM, 80
+MFA, 75
+Zero Trust, 75
+Vulnerability Assessment, 75
+Penetration Testing, 75
+EDR, 75
+Network Security, 80
+Firewalls, 75
+DLP, 75
+SOC, 75
+SIEM Tools, 75
+Encryption, 75
+Key Management, 75
+Security Compliance, 75
+Android, 75
+iOS, 75
+Jetpack Compose, 75
+Android Jetpack, 75
+Google Play, 75
+App Store Connect, 75
+In-App Purchases, 75
+Push Notifications, 75
+Mobile UI/UX, 75
+Cross-Platform Development, 75
+Mobile App Testing, 75
+Mobile CI/CD, 75
+Unity, 85
+Unreal Engine, 75
+Shader Programming, 75
+Game Physics, 75
+Game Mechanics, 75
+2D Game Development, 75
+3D Game Development, 75
+Multiplayer Networking, 75
+Photon, 75
+Asset Optimization, 75
+Level Design, 75
+Game UI, 75
+Mobile Games, 75
+VR Game Development, 75
+AR Game Development, 75
+Animation Systems, 75
+Scripting Engines, 75
+In-Game Monetization, 75
+Solidity, 75
+Smart Contracts, 75
+Ethereum, 75
+Polygon, 75
+Binance Smart Chain, 75
+Solana, 75
+dApps, 75
+Metamask, 75
+Web3.js, 75
+Ethers.js, 75
+IPFS, 75
+ERC20, 75
+ERC721, 75
+ERC1155, 75
+DeFi, 75
+Smart Contract Testing, 75
+Gas Optimization, 75
+Blockchain Wallets, 75
+DLT, 75

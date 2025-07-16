@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+
+{% block title %}Insights Dashboard{% endblock %}
+
+{% block content %}
+<!-- FullCalendar CSS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+
+<div class="max-w-7xl mx-auto px-4 py-10 pt-24 space-y-10">
+
+    {% if is_admin %}
+    <!-- Admin Filter -->
+    <div class="mb-6">
+        <form method="get" class="flex items-center gap-2" id="user-filter-form">
+            <label for="user_id" class="text-sm text-gray-600">Viewing data for:</label>
+                <select name="user_id" id="user_id" class="border rounded px-2 py-1 text-sm">
+                    <option value="">-- All Users --</option>
+                    {% for user in users %}
+                        <option value="{{ user.id }}" {% if user.id|stringformat:"s" == selected_user_id|stringformat:"s" %}selected{% endif %}>
+                            {{ user.username }}
+                        </option>
+                    {% endfor %}
+                </select>
+            <noscript>
+                <button type="submit" class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">
+                    View
+                </button>
+            </noscript>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Top Summary -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div class="bg-white rounded-xl shadow p-5 text-center">
+            <h3 class="text-sm text-gray-500 uppercase tracking-wide">Total Applications</h3>
+            <p id="summary-total" class="text-3xl font-extrabold text-gray-900 mt-2">—</p>
+        </div>
+        <div class="bg-white rounded-xl shadow p-5 text-center">
+            <h3 class="text-sm text-gray-500 uppercase tracking-wide">Interviews</h3>
+            <p id="summary-interview" class="text-3xl font-extrabold text-green-600 mt-2">—</p>
+        </div>
+        <div class="bg-white rounded-xl shadow p-5 text-center">
+            <h3 class="text-sm text-gray-500 uppercase tracking-wide">Offers</h3>
+            <p id="summary-offer" class="text-3xl font-extrabold text-blue-600 mt-2">—</p>
+        </div>
+    </div>
+
+    <!-- Main Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Status Pie Chart -->
+        <div class="bg-white rounded-xl shadow p-6">
+            <h2 class="text-lg font-bold text-gray-800 mb-4">Application Status Distribution</h2>
+            <canvas id="job-application-chart" class="w-full h-72"></canvas>
+        </div>
+
+        <!-- FullCalendar View -->
+        <div class="bg-white rounded-xl shadow p-6">
+            <h2 class="text-lg font-bold text-gray-800 mb-4">Calendar View of Applications</h2>
+            <div id="calendar" class="w-full"></div>
+            <div class="flex items-center gap-2 mt-4 text-sm text-gray-600">
+                <span class="w-4 h-4 rounded" style="background-color: rgb(230, 244, 255);"></span> 1–10
+                <span class="w-4 h-4 rounded" style="background-color: rgb(105, 175, 240);"></span> 11–50
+                <span class="w-4 h-4 rounded" style="background-color: rgb(0, 81, 255);"></span> 51–100+
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Applications Table -->
+    <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">Recent Applications</h2>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left border-collapse">
+                <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
+                    <tr>
+                        <th class="px-4 py-3">Job Title</th>
+                        <th class="px-4 py-3">Company</th>
+                        <th class="px-4 py-3">Status</th>
+                        <th class="px-4 py-3">Date</th>
+                    </tr>
+                </thead>
+                <tbody id="recent-applications" class="divide-y divide-gray-200 text-gray-800">
+                    <!-- Populated via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+<script>
+    const selectedUserId = "{{ selected_user_id }}";
+
+    // Pie Chart
+    $.get("/get_job_status_counts/", { user_id: selectedUserId }, function (counts) {
+        const total = Object.values(counts).reduce((a, b) => a + b, 0);
+        $('#summary-total').text(total);
+        $('#summary-interview').text(counts.interview || 0);
+        $('#summary-offer').text(counts.offer || 0);
+
+        const ctx = document.getElementById('job-application-chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Applied', 'Interview', 'Offer', 'Rejected'],
+                datasets: [{
+                    data: [counts.applied || 0, counts.interview || 0, counts.offer || 0, counts.rejected || 0],
+                    backgroundColor: ['#3B82F6', '#10B981', '#EF4444', '#000000'],
+                    borderWidth: 2,
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                const value = tooltipItem.raw;
+                                const percent = ((value / total) * 100).toFixed(1);
+                                return `${tooltipItem.label}: ${value} (${percent}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+
+    // FullCalendar Initialization
+    document.addEventListener('DOMContentLoaded', function () {
+        const calendarEl = document.getElementById('calendar');
+
+        fetch('/get_applications_json/?user_id=' + selectedUserId)
+            .then(response => response.json())
+            .then(events => {
+                const maxCount = Math.max(...events.map(e => e.count));
+
+                const calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    height: 500,
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: ''
+                    },
+                    eventDisplay: 'block',
+                    events: events.map(e => {
+                        const intensity = e.count / maxCount;
+                        const baseColor = [37, 99, 235]; // Tailwind blue-600
+                        const blended = baseColor.map(c => Math.round(255 - (255 - c) * intensity));
+                        return {
+                            title: e.title,
+                            start: e.start,
+                            backgroundColor: `rgb(${blended.join(',')})`,
+                            borderColor: `rgb(${blended.join(',')})`,
+                            textColor: intensity > 0.4 ? 'white' : 'black',
+                            extendedProps: {
+                                tooltip: `${e.count} application(s)`
+                            }
+                        };
+                    }),
+                    eventDidMount: function (info) {
+                        const tooltip = document.createElement('div');
+                        tooltip.innerText = info.event.extendedProps.tooltip;
+                        tooltip.className = "absolute z-50 bg-gray-900 text-white text-xs px-2 py-1 rounded shadow hidden";
+                        document.body.appendChild(tooltip);
+
+                        info.el.addEventListener('mouseenter', (e) => {
+                            tooltip.style.display = 'block';
+                            tooltip.style.top = (e.pageY + 10) + 'px';
+                            tooltip.style.left = (e.pageX + 10) + 'px';
+                        });
+
+                        info.el.addEventListener('mousemove', (e) => {
+                            tooltip.style.top = (e.pageY + 10) + 'px';
+                            tooltip.style.left = (e.pageX + 10) + 'px';
+                        });
+
+                        info.el.addEventListener('mouseleave', () => {
+                            tooltip.style.display = 'none';
+                        });
+                    }
+                });
+
+                calendar.render();
+            });
+    });
+
+    // Fill recent applications
+    {% if recent_jobs %}
+    const recentData = {{ recent_jobs|safe }};
+    const tbody = document.getElementById('recent-applications');
+    recentData.forEach(job => {
+        tbody.innerHTML += `
+            <tr>
+                <td class="px-4 py-2">${job.job_title}</td>
+                <td class="px-4 py-2">${job.company_name}</td>
+                <td class="px-4 py-2 capitalize">${job.status}</td>
+                <td class="px-4 py-2">${new Date(job.created_at).toLocaleDateString()}</td>
+            </tr>
+        `;
+    });
+    {% endif %}
+
+    // Auto-submit form on user selection
+    document.getElementById('user_id')?.addEventListener('change', function () {
+        document.getElementById('user-filter-form').submit();
+    });
+
+</script>
+{% endblock %}

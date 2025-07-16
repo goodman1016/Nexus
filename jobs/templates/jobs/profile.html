@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto mt-20 px-4">
+  <div class="bg-white p-10 rounded-3xl shadow-xl border border-gray-100">
+
+    <!-- Profile Header -->
+    <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-8">
+      {% load file_extras %}
+      {% if user.userprofile.profile_picture and user.userprofile.profile_picture.url|file_exists %}
+        <img src="{{ user.userprofile.profile_picture.url }}" alt="Profile picture"
+            class="w-28 h-28 rounded-full shadow-md object-cover ring-2 ring-blue-500" />
+      {% else %}
+        <div class="w-28 h-28 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-md">
+          {{ user.username|first|upper }}
+        </div>
+      {% endif %}
+
+      <!-- Info -->
+      <div class="text-center sm:text-left">
+        <h2 class="text-3xl font-bold text-gray-800">Welcome back, {{ user.username|title }} 👋</h2>
+        <div class="mt-2 text-gray-600 space-y-1 text-sm">
+          <p><span class="font-semibold">Email:</span> {{ user.email }}</p>
+          <p><span class="font-semibold">Username:</span> {{ user.username }}</p>
+          <p><span class="font-semibold">Last login:</span> {{ user.last_login|date:"M d, Y H:i" }}</p>
+          <p><span class="font-semibold">Phone:</span> {{ user.userprofile.phone_number|default:"Not set" }}</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="my-6 border-t border-gray-200">
+
+    <!-- Actions -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <a href="{% url 'edit_profile' %}"
+         class="flex items-center justify-center px-4 py-3 bg-blue-100 text-blue-800 rounded-xl font-medium hover:bg-blue-200 transition">
+        ✏️ Edit Profile
+      </a>
+
+      <form method="post" action="{% url 'logout' %}" class="w-full">
+        {% csrf_token %}
+        <button type="submit"
+                class="w-full flex items-center justify-center px-4 py-3 bg-red-100 text-red-700 rounded-xl font-medium hover:bg-red-200 transition">
+          🚪 Logout
+        </button>
+      </form>
+
+      <a href="{% url 'applications' %}"
+         class="flex items-center justify-center px-4 py-3 bg-gray-100 text-gray-800 rounded-xl font-medium hover:bg-gray-200 transition">
+        ⬅️ Back to Applications
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

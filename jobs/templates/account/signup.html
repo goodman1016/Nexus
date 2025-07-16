@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load socialaccount %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+  <div class="bg-white p-8 rounded-xl shadow-xl max-w-sm w-full">
+    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Create Your Account</h2>
+
+    <div class="text-center">
+      <a href="{% provider_login_url 'google' %}"
+         class="inline-block w-full px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded font-semibold">
+        Sign Up with Google
+      </a>
+    </div>
+
+    <p class="mt-6 text-sm text-center text-gray-500">
+      Already have an account?
+      <a href="{% url 'login' %}" class="text-blue-600 hover:underline">Login here</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

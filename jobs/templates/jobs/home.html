@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome to JobTracker{% endblock %}
+
+{% block content %}
+<!-- Vanta Background Container -->
+<div id="vanta-bg">
+    <div class="hero-content">
+        <div class="hero-icon">🚀</div>
+        <h1>Welcome to JobTracker</h1>
+        <p>Track your job applications, manage interviews, and stay organized — all from a beautifully modern dashboard tailored to your success.</p>
+        <a href="{% url 'applications' %}" class="btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+                 viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 5l7 7-7 7" />
+            </svg>
+            Enter Applications Page
+        </a>
+    </div>
+</div>
+
+<!-- STYLES -->
+<style>
+    body {
+        margin: 0;
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+        color: white;
+        overflow: hidden;
+    }
+
+    #vanta-bg {
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        z-index: 2;
+        padding: 2rem;
+    }
+
+    .hero-icon {
+        font-size: 5rem;
+        animation: float 4s ease-in-out infinite;
+        margin-bottom: 1.5rem;
+        color: #38bdf8;
+    }
+
+    h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(to right, #38bdf8, #0ea5e9);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+    }
+
+    p {
+        font-size: 1.15rem;
+        color: #cbd5e1;
+        margin-bottom: 2.5rem;
+    }
+
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.8rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 999px;
+        background: linear-gradient(to right, #0ea5e9, #38bdf8);
+        color: white;
+        box-shadow: 0 0 16px rgba(56, 189, 248, 0.5);
+        transition: all 0.3s ease;
+        border: none;
+        text-decoration: none;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0 24px rgba(56, 189, 248, 0.8);
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-12px); }
+    }
+</style>
+
+<!-- SCRIPTS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js"></script>
+<script>
+  VANTA.WAVES({
+    el: "#vanta-bg",
+    mouseControls: true,
+    touchControls: true,
+    gyroControls: false,
+    scale: 1.0,
+    scaleMobile: 1.0,
+    color: 0x111111,           // Dark gray-black wave
+    shininess: 80,
+    waveHeight: 20,
+    waveSpeed: 1.0,
+    zoom: 1.1,
+    backgroundColor: 0x000000  // Pure black background
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,27 @@
+{% with s=status|lower %}
+    {% if s == "recruiter call" %}
+        <span class="bg-green-100 text-green-800 px-2 py-1 text-xs rounded font-semibold">Recruiter Call</span>
+    {% elif s == "hr interview" %}
+        <span class="bg-green-200 text-blue-800 px-2 py-1 text-xs rounded font-semibold">HR Interview</span>
+    {% elif s == "technical interview" %}
+        <span class="bg-green-300 text-gray-900 px-2 py-1 text-xs rounded font-semibold">Technical Interview</span>
+    {% elif s == "final interview" %}
+        <span class="bg-red-300 text-red-800 px-2 py-1 text-xs rounded font-semibold">Final Interview</span>
+    {% elif s == "offer accepted" %}
+        <span class="bg-red-500 text-emerald-800 px-2 py-1 text-xs rounded font-semibold">Offer Accepted</span>
+    {% elif s == "offer rejected" %}
+        <span class="bg-gray-400 text-pink-900 px-2 py-1 text-xs rounded font-semibold">Offer Rejected</span>
+    {% elif s == "manager call" %}
+        <span class="bg-blue-100 text-indigo-900 px-2 py-1 text-xs rounded font-semibold">Manager Call</span>
+    {% elif s == "team fit interview" %}
+        <span class="bg-blue-200 text-orange-900 px-2 py-1 text-xs rounded font-semibold">Team Fit Interview</span>
+    {% elif s == "assignment discussion" %}
+        <span class="bg-blue-300 text-yellow-900 px-2 py-1 text-xs rounded font-semibold">Assignment Discussion</span>
+    {% elif s == "culture interview" %}
+        <span class="bg-yellow-100 text-lime-900 px-2 py-1 text-xs rounded font-semibold">Culture Interview</span>
+    {% elif s == "panel interview" %}
+        <span class="bg-yellow-500 text-purple-900 px-2 py-1 text-xs rounded font-semibold">Panel Interview</span>
+    {% else %}
+        <span class="bg-gray-100 text-gray-800 px-2 py-1 text-xs rounded font-semibold">Other</span>
+    {% endif %}
+{% endwith %}

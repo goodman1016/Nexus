@@ -1,0 +1,152 @@
+{% load file_extras %}
+<nav class="fixed top-0 left-0 w-full z-50 backdrop-blur-md bg-gray-900 text-white border-b border-gray-800 shadow-md">
+  <div class="max-w-7xl mx-auto flex items-center justify-between px-6 lg:px-10 h-16">
+
+    <!-- Left: Logo -->
+    <a href="/" class="flex items-center space-x-2 text-white font-bold text-xl">
+      <span class="text-2xl">📋</span>
+      <span>JobTracker</span>
+    </a>
+
+    <!-- Center: Nav Links -->
+    <div class="hidden md:flex items-center space-x-8 text-[15px] font-medium">
+      <a href="{% url 'home' %}" class="nav-item {% if request.path == '/' %}active{% endif %}">Home</a>
+      <a href="{% url 'applications' %}" class="nav-item {% if 'applications' in request.path and not 'charts' in request.path %}active{% endif %}">Applications</a>
+      <a href="{% url 'application_charts' %}" class="nav-item {% if 'charts' in request.path %}active{% endif %}">Insights</a>
+      <a href="{% url 'interviews_user' %}" class="nav-item {% if request.path|slice:":11" == "/interviews" %}active{% endif %}">Interviews</a>
+    </div>
+
+    <!-- Right: User -->
+    {% if user.is_authenticated %}
+    <div class="relative group">
+      <button id="userMenuBtn" type="button" class="flex items-center gap-2 text-sm font-medium text-white hover:text-blue-400 transition duration-200">
+        {% if user.userprofile.profile_picture and user.userprofile.profile_picture.url|file_exists %}
+          <img src="{{ user.userprofile.profile_picture.url }}" class="w-9 h-9 rounded-full object-cover border-2 border-white shadow-md" alt="Avatar" />
+        {% else %}
+          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-md">
+            {{ user.username|first|upper }}
+          </div>
+        {% endif %}
+        <span class="hidden sm:inline">{{ user.username }}</span>
+        <svg class="w-4 h-4 transform transition-transform group-hover:rotate-180" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06L10.53 13.28a.75.75 0 01-1.06 0L5.25 8.29a.75.75 0 01-.02-1.06z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+
+      <!-- Dropdown -->
+      <div id="userMenu" class="hidden group-hover:flex flex-col absolute right-0 mt-2 w-48 bg-gray-800 text-white shadow-xl rounded-lg py-2 ring-1 ring-black/10 z-50">
+        <a href="{% url 'profile' %}" class="dropdown-item">👤 My Profile</a>
+        <a href="{% url 'settings' %}" class="dropdown-item">⚙️ Settings</a>
+        {% if user.is_superuser %}
+        <a href="/admin/" class="dropdown-item font-semibold">🛠 Admin Panel</a>
+        <a href="{% url 'user_status' %}" class="dropdown-item font-semibold">👥 User Status</a>
+        {% endif %}
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="dropdown-item text-red-400 hover:text-red-500">🚪 Logout</button>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</nav>
+
+<style>
+  .nav-item {
+    position: relative;
+    color: #e5e7eb; /* Tailwind gray-200 */
+    padding: 0.25rem 0;
+    transition: color 0.2s ease;
+  }
+  .nav-item::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    height: 2px;
+    width: 0;
+    background-color: #3b82f6; /* blue-500 */
+    transition: width 0.3s ease;
+  }
+  .nav-item:hover::after {
+    width: 100%;
+  }
+  .nav-item:hover {
+    color: #60a5fa; /* blue-400 */
+  }
+  .nav-item.active {
+    color: #3b82f6; /* blue-500 */
+    font-weight: 600;
+  }
+  .nav-item.active::after {
+    width: 100%;
+  }
+
+  .dark .nav-item {
+    color: #e5e7eb; /* light gray */
+  }
+  .dark .nav-item:hover {
+    color: #60a5fa;
+  }
+  .dark .nav-item.active {
+    color: #3b82f6;
+  }
+
+  .dropdown-item {
+    display: block;
+    padding: 0.6rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #f1f5f9; /* brighter text */
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .dropdown-item:hover {
+    background-color: #334155; /* slate-700 */
+    color: #ffffff;
+  }
+
+  .dark .dropdown-item {
+    color: #f1f5f9; /* brighten for dark mode */
+  }
+
+  .dark .dropdown-item:hover {
+    background-color: #1e293b; /* slate-800 */
+    color: #ffffff;
+  }
+
+  .dropdown-item.text-red-400 {
+    color: #f87171; /* red-400 */
+  }
+
+  .dropdown-item.text-red-400:hover {
+    color: #fca5a5; /* red-300 */
+    background-color: #1e293b;
+  }
+  .dropdown-item:first-child {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+  }
+  .dropdown-item:last-child {
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+  }
+</style>
+
+<script>
+  const btn = document.getElementById('userMenuBtn');
+  const menu = document.getElementById('userMenu');
+
+  if (btn && menu) {
+    document.addEventListener('click', function (e) {
+      if (!btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.add('hidden');
+      }
+    });
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      menu.classList.toggle('hidden');
+    });
+  }
+</script>

@@ -1,0 +1,56 @@
+<tr class="{% if proposal.approved is False %}opacity-60{% elif proposal.approved is none %}bg-yellow-50{% endif %} hover:bg-gray-50 transition">
+  <td class="px-4 py-3 text-blue-600 font-medium">{{ proposal.application.job_title }}</td>
+  <td class="px-4 py-3 text-gray-700">{{ proposal.application.company_name }}</td>
+
+  <!-- Status Badge -->
+  <td class="px-4 py-3">
+    {% if proposal.approved is none %}
+      <span class="text-yellow-700 bg-yellow-100 px-3 py-1 rounded-full text-xs font-semibold">Pending</span>
+    {% elif proposal.approved %}
+      <span class="text-green-700 bg-green-100 px-3 py-1 rounded-full text-xs font-semibold">Approved</span>
+    {% else %}
+      <span class="text-red-700 bg-red-100 px-3 py-1 rounded-full text-xs font-semibold">Rejected</span>
+    {% endif %}
+  </td>
+
+  <!-- Approved At -->
+  <td class="px-4 py-3 text-gray-600">
+    {% if proposal.approved_at %}
+      {{ proposal.approved_at|date:"M d, Y H:i" }}
+    {% else %}
+      <span class="text-gray-400">–</span>
+    {% endif %}
+  </td>
+
+  <!-- Rejected At -->
+  <td class="px-4 py-3 text-gray-600">
+    {% if proposal.rejected_at %}
+      {{ proposal.rejected_at|date:"M d, Y H:i" }}
+    {% else %}
+      <span class="text-gray-400">–</span>
+    {% endif %}
+  </td>
+
+  <!-- Comment -->
+  <td class="px-4 py-3 text-gray-500 italic">
+    {% if proposal.comment %}
+      “{{ proposal.comment }}”
+    {% else %}
+      <span class="text-gray-400">–</span>
+    {% endif %}
+  </td>
+
+  <!-- Proposed Badge -->
+  <td class="px-4 py-3">
+    <span class="text-xs font-medium px-3 py-1 rounded-full shadow 
+      {% if proposal.proposed_status|lower == 'technical interview' %}
+        bg-indigo-100 text-indigo-700
+      {% elif proposal.proposed_status|lower == 'hr interview' %}
+        bg-emerald-100 text-emerald-700
+      {% else %}
+        bg-gray-200 text-gray-800
+      {% endif %}">
+      {{ proposal.proposed_status|title }}
+    </span>
+  </td>
+</tr>

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="p-4">
+  <h2 class="text-xl font-bold mb-4">User Login Status</h2>
+  <table class="w-full border">
+    <thead>
+      <tr>
+        <th class="border px-4 py-2 text-left">Username</th>
+        <th class="border px-4 py-2 text-left">Email</th>
+        <th class="border px-4 py-2 text-left">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for profile in profiles %}
+        <tr>
+          <td class="border px-4 py-2">{{ profile.user.username }}</td>
+          <td class="border px-4 py-2">{{ profile.user.email }}</td>
+          <td class="border px-4 py-2">
+            {% if profile.is_online %}
+              <span class="text-green-600 font-semibold">Online</span>
+            {% else %}
+              <span class="text-gray-500">Offline</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

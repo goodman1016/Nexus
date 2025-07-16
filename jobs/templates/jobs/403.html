@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}403 Forbidden{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-100">
+  <div class="bg-white p-8 rounded shadow-md max-w-lg w-full text-center">
+    <h1 class="text-4xl font-bold text-red-600 mb-4">403 Forbidden</h1>
+    <p class="text-gray-700 text-lg mb-6">
+      Your account is awaiting admin approval. You do not have permission to access this page yet.
+    </p>
+    <a href="{% url 'home' %}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-semibold">
+      Return to Home
+    </a>
+  </div>
+</div>
+{% endblock %}

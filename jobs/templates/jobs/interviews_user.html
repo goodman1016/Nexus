@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-100 to-pink-50 pt-24 px-6 max-w-7xl mx-auto text-gray-800">
+  <div class="mb-10">
+    <h1 class="text-4xl font-bold text-gray-800 flex items-center gap-2"> Interview Proposals
+    </h1>
+
+    {% if user_score %}
+    <div class="bg-green-100 border border-green-300 text-green-800 px-4 py-2 rounded mt-4 font-semibold shadow flex items-center gap-2">
+      <i data-lucide="badge-dollar-sign" class="w-5 h-5 text-green-600"></i> Your Current Unpaid Score: {{ user_score }}
+    </div>
+    {% endif %}
+
+    <div class="flex gap-4 mt-6 text-sm">
+      <a href="{% url 'interviews_user' %}" class="px-4 py-1 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 shadow flex items-center gap-1 {% if request.path == '/interviews/' %}ring-2 ring-yellow-400{% endif %}">
+        <i data-lucide="file-text" class="w-4 h-4"></i> Interview Proposals
+      </a>
+      <a href="{% url 'interview_charts' %}" class="px-4 py-1 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 shadow flex items-center gap-1 {% if request.path == '/interviews/interview-c/' %}ring-2 ring-yellow-400{% endif %}">
+        <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Interview Charts
+      </a>
+    </div>
+
+    <p class="text-gray-500 mt-2 text-sm">Track all your interview proposals — pending, approved, and rejected — across job applications.</p>
+  </div>
+
+  <!-- Filter/Search -->
+  <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
+    <div class="flex gap-2 items-center">
+      <label for="status" class="text-gray-600">Filter by Status:</label>
+      <select name="status" id="status" class="bg-white border border-gray-300 px-3 py-2 rounded shadow-sm text-sm">
+        <option value="">All</option>
+        {% for status in all_statuses %}
+          <option value="{{ status.name }}" {% if request.GET.status == status.name %}selected{% endif %}>
+            {{ status.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <input type="text" id="search" value="{{ request.GET.search }}" placeholder="Search job/company..." class="bg-white border border-gray-300 px-3 py-2 rounded shadow-sm text-sm w-64">
+    </div>
+
+    <div class="flex gap-3 text-sm">
+      <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full shadow flex items-center gap-1">
+        <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i> Approved: {{ approved_count }}
+      </span>
+      <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full shadow flex items-center gap-1">
+        <i data-lucide="x-circle" class="w-4 h-4 text-red-600"></i> Rejected: {{ rejected_count }}
+      </span>
+      <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full shadow flex items-center gap-1">
+        <i data-lucide="clock" class="w-4 h-4 text-yellow-500"></i> Pending: {{ pending_count }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="overflow-x-auto rounded-xl shadow border border-gray-200 bg-white">
+    <table class="w-full text-left text-sm">
+      <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
+        <tr>
+          <th class="px-4 py-3">Job Title</th>
+          <th class="px-4 py-3">Company</th>
+          <th class="px-4 py-3">Status</th>
+          <th class="px-4 py-3">Approved At</th>
+          <th class="px-4 py-3">Rejected At</th>
+          <th class="px-4 py-3">Comment</th>
+          <th class="px-4 py-3">Badge</th>
+        </tr>
+      </thead>
+      <tbody id="proposal-tbody" class="divide-y divide-gray-100 text-gray-700">
+        {% for proposal in page_obj %}
+          {% include 'jobs/_proposal_row.html' with proposal=proposal %}
+        {% empty %}
+          <tr><td colspan="7" class="text-center py-4">No interview proposals found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="mt-6 flex justify-center">
+    <nav class="inline-flex items-center space-x-1">
+      {% if page_obj.has_previous %}
+        <a href="?page=1{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="px-3 py-1 border rounded-l bg-white hover:bg-gray-100">First</a>
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="px-3 py-1 border bg-white hover:bg-gray-100">Previous</a>
+      {% endif %}
+
+      <span class="px-3 py-1 border bg-gray-200">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="px-3 py-1 border bg-white hover:bg-gray-100">Next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="px-3 py-1 border rounded-r bg-white hover:bg-gray-100">Last</a>
+      {% endif %}
+    </nav>
+  </div>
+
+  <!-- Charts -->
+  <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white p-6 rounded-xl shadow border border-gray-200">
+      <h2 class="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
+        <i data-lucide="line-chart" class="w-5 h-5 text-blue-600"></i> Interview Trend
+      </h2>
+      <canvas id="trendChart" height="200"></canvas>
+    </div>
+    <div class="bg-white p-6 rounded-xl shadow border border-gray-200">
+      <h2 class="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
+        <i data-lucide="funnel" class="w-5 h-5 text-indigo-600"></i> Conversion Funnel
+      </h2>
+      <canvas id="funnelChart" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div id="empty-state" class="text-center mt-24 text-gray-500 hidden">
+    <i data-lucide="inbox" class="w-14 h-14 mx-auto mb-4 text-gray-400"></i>
+    <p class="text-lg font-medium">No matching interview proposals found.</p>
+    <p class="text-sm mt-2 text-gray-400">Try adjusting your filters or search keywords.</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/luxon@3"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("search");
+    const filterSelect = document.getElementById("status");
+    const tbody = document.getElementById("proposal-tbody");
+    const emptyState = document.getElementById("empty-state");
+
+    let debounceTimer;
+
+    function fetchResults() {
+        const search = searchInput.value.trim();
+        const filter = filterSelect.value;
+
+        fetch(`/interviews/live-search/?search=${encodeURIComponent(search)}&filter=${encodeURIComponent(filter)}`)
+            .then(res => res.json())
+            .then(data => {
+                tbody.innerHTML = data.html;
+                emptyState.classList.toggle("hidden", data.html.trim() !== "");
+            });
+    }
+
+    searchInput.addEventListener("input", () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(fetchResults, 300);
+    });
+
+    filterSelect.addEventListener("change", fetchResults);
+
+    // Trend Chart
+    fetch('/interview/trend-data/')
+        .then(res => res.json())
+        .then(data => {
+            const chartData = data.map(item => ({ x: item.date, y: item.count }));
+            new Chart(document.getElementById('trendChart'), {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'Interview Proposals',
+                        data: chartData,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'day',
+                                tooltipFormat: 'MMM d',
+                                displayFormats: { day: 'MMM d', week: 'MMM d', month: 'MMM yyyy' }
+                            },
+                            title: { display: true, text: 'Date' }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Proposals' },
+                            ticks: { precision: 0 }
+                        }
+                    }
+                }
+            });
+        });
+
+    // Funnel Chart
+    fetch('/interview/conversion-data/')
+        .then(res => res.json())
+        .then(data => {
+            new Chart(document.getElementById('funnelChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Applied', 'Interviewed', 'Approved', 'Rejected'],
+                    datasets: [{
+                        label: 'Count',
+                        data: [data.total, data.interviewed, data.approved, data.rejected],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        });
+});
+</script>
+{% endblock %}

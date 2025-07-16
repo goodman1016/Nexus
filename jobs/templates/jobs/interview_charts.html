@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="pt-24 px-6 max-w-6xl mx-auto text-white">
+
+  <!-- 🔙 Back Button -->
+  <a href="{% url 'interviews_user' %}"
+     class="inline-block mb-6 px-4 py-1 rounded-full bg-gray-800 text-white hover:bg-gray-700 text-sm">
+     ← Back to Proposals
+  </a>
+
+  <h1 class="text-3xl font-bold mb-4">📈 Interview Analytics</h1>
+
+  <!-- Trend Chart -->
+  <div class="bg-gray-900 p-4 rounded-xl shadow mb-8">
+    <h2 class="text-xl font-semibold mb-2">Interview Proposals Over Time</h2>
+    <canvas id="trendChart" height="100"></canvas>
+  </div>
+
+  <!-- Conversion Chart -->
+  <div class="bg-gray-900 p-4 rounded-xl shadow">
+    <h2 class="text-xl font-semibold mb-2">Interview Conversion Stats</h2>
+    <canvas id="funnelChart" height="100"></canvas>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // Trend Chart
+  fetch("{% url 'interview_trend_data' %}")
+    .then(res => res.json())
+    .then(data => {
+      const ctx = document.getElementById("trendChart").getContext("2d");
+      new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: data.map(d => d.date),
+          datasets: [{
+            label: "Interview Proposals",
+            data: data.map(d => d.count),
+            borderWidth: 2,
+            fill: true
+          }]
+        }
+      });
+    });
+
+  // Conversion Chart
+  fetch("{% url 'interview_conversion_data' %}")
+    .then(res => res.json())
+    .then(data => {
+      const ctx2 = document.getElementById("funnelChart").getContext("2d");
+      new Chart(ctx2, {
+        type: "bar",
+        data: {
+          labels: ["Applied", "Interviewed", "Approved", "Rejected"],
+          datasets: [{
+            label: "Applications",
+            data: [data.applied, data.interviewed, data.approved, data.rejected],
+            borderWidth: 1
+          }]
+        }
+      });
+    });
+});
+</script>
+{% endblock %}
