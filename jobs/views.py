@@ -39,7 +39,6 @@ import subprocess
 import os
 import json
 
-from django.views.decorators.cache import cache_page
 from django.db.models import Prefetch
 
 def check_approval(request):
@@ -82,7 +81,6 @@ def home(request):
         return approval_check
     return render(request, 'jobs/home.html')
 
-@cache_page(60 * 3)
 def applications(request):
     if request.method == 'GET':
         selected_user_id = request.GET.get('user_id')
