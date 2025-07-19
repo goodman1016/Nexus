@@ -42,23 +42,27 @@
     </script>
     
     <script>
-    function updateClock() {
+    function updateSGTClock() {
         const now = new Date();
-        const dateString = now.toLocaleDateString('en-US', {
+
+        // Convert to SGT (UTC+8)
+        const options = {
+        timeZone: 'Asia/Singapore',
         month: 'short',
         day: 'numeric',
-        });
-        const timeString = now.toLocaleTimeString([], {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
-        });
-        const clock = document.getElementById('clock');
-        if (clock) clock.textContent = `${dateString}, ${timeString}`;
+        hour12: true,
+        };
+
+        const sgtTime = now.toLocaleString('en-US', options);
+        const clockEl = document.getElementById('sgt-clock');
+        if (clockEl) clockEl.textContent = `SGT: ${sgtTime}`;
     }
 
-    setInterval(updateClock, 1000);
-    updateClock();
+    setInterval(updateSGTClock, 1000);
+    updateSGTClock();
     </script>
 
 </body>

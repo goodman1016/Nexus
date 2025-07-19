@@ -28,7 +28,6 @@
           </div>
         {% endif %}
         <span class="hidden sm:inline">{{ user.username }}</span>
-        <span id="clock" class="hidden sm:inline text-sm text-gray-300 ml-4 font-mono"></span>
         <svg class="w-4 h-4 transform transition-transform group-hover:rotate-180" fill="currentColor" viewBox="0 0 20 20">
           <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06L10.53 13.28a.75.75 0 01-1.06 0L5.25 8.29a.75.75 0 01-.02-1.06z" clip-rule="evenodd"/>
         </svg>
@@ -49,6 +48,9 @@
       </div>
     </div>
     {% endif %}
+    <div class="hidden sm:flex items-center text-sm text-gray-300 font-mono ml-6" id="sgt-clock">
+      <!-- SGT time will go here -->
+    </div>
   </div>
 </nav>
 
