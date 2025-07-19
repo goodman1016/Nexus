@@ -40,5 +40,26 @@
     <script>
         lucide.createIcons();
     </script>
+    
+    <script>
+    function updateClock() {
+        const now = new Date();
+        const dateString = now.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        });
+        const timeString = now.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        });
+        const clock = document.getElementById('clock');
+        if (clock) clock.textContent = `${dateString}, ${timeString}`;
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+    </script>
+
 </body>
 </html>
