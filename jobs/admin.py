@@ -17,8 +17,7 @@ class JobApplicationInline(admin.TabularInline):
     fk_name = 'user'
 
     def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        return qs.order_by('-created_at')
+        return super().get_queryset(request).order_by('-created_at')
 
 # Inline for UserProfile
 class UserProfileInline(admin.StackedInline):
