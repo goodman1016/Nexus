@@ -263,3 +263,6 @@ if not DEBUG:
     ]
 
 print("ALLOWED_HOSTS at runtime:", ALLOWED_HOSTS)
+
+# Allow large admin form submissions
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
