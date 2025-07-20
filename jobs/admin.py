@@ -5,13 +5,20 @@ from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.timezone import now
 from .models import PaymentBatch
+from django.utils.safestring import mark_safe
+from django.urls import reverse
 
 # Inline for Job Applications in UserAdmin
 class JobApplicationInline(admin.TabularInline):
     model = JobApplication
     extra = 0
+    max_num = 20  # Limits to showing 20 records in the inline form
     readonly_fields = ('job_title', 'company_name', 'status', 'created_at')
     fk_name = 'user'
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.order_by('-created_at')[:20]  # Show only the latest 20 applications
 
 # Inline for UserProfile
 class UserProfileInline(admin.StackedInline):
@@ -33,8 +40,15 @@ class UserAdmin(BaseUserAdmin):
         'get_groups',
         'get_is_online',
         'get_is_approved',
+        'view_all_applications_link',
     )
+    
+    def view_all_applications_link(self, obj):
+        url = reverse("admin:jobs_jobapplication_changelist") + f"?user__id__exact={obj.id}"
+        return mark_safe(f'<a href="{url}" target="_blank">🔍 View All</a>')
 
+    view_all_applications_link.short_description = "Applications"
+        
     def get_is_online(self, obj):
         try:
             return obj.userprofile.is_online
