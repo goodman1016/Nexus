@@ -12,13 +12,13 @@ from django.urls import reverse
 class JobApplicationInline(admin.TabularInline):
     model = JobApplication
     extra = 0
-    max_num = 20  # Limits to showing 20 records in the inline form
+    max_num = 20
     readonly_fields = ('job_title', 'company_name', 'status', 'created_at')
     fk_name = 'user'
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        return qs.order_by('-created_at')[:20]  # Show only the latest 20 applications
+        return qs.order_by('-created_at')
 
 # Inline for UserProfile
 class UserProfileInline(admin.StackedInline):
