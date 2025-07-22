@@ -29,7 +29,7 @@ class JobApplication(models.Model):
 
     company_name = models.CharField(max_length=255)
     job_title = models.CharField(max_length=255)
-    job_url = models.URLField(blank=True)
+    job_url = models.CharField(max_length=1000, blank=True)
     notes = models.TextField(blank=True)
     status = models.ForeignKey(ApplicationStatus, on_delete=models.SET_NULL, null=True, blank=True)
     payment_status = models.CharField(max_length=10, choices=PAYMENT_STATUS_CHOICES, default='unpaid')
