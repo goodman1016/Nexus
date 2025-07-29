@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from .models import JobApplication
-from django.utils.timezone import make_aware
+from django.utils.timezone import make_aware, now, timedelta
 from datetime import datetime
 from django.db.models import Count
 from django.core.paginator import Paginator
@@ -383,10 +383,11 @@ def get_job_status_counts(request):
     else:
         target_user = None  # All users
 
-    queryset = JobApplication.objects.all()
+    queryset = JobApplication.objects.only('id', 'user_id', 'created_at', 'status', 'job_title', 'company_name').select_related('status')
     if target_user:
         queryset = queryset.filter(user=target_user)
-
+    
+    queryset = queryset.filter(created_at__gte=now() - timedelta(days=90))
     counts = {'applied': 0, 'interview': 0, 'offer': 0, 'rejected': 0}
 
     # Build a lookup for ranks
@@ -594,10 +595,12 @@ def application_charts(request):
             target_user = get_object_or_404(User, id=user_id)
             queryset = JobApplication.objects.filter(user=target_user)
         else:
-            queryset = JobApplication.objects.all()  # Show all users if no specific ID
+            queryset = JobApplication.objects.only('id', 'user_id', 'created_at', 'status', 'job_title', 'company_name').select_related('status')  # Show all users if no specific ID
     else:
         queryset = JobApplication.objects.filter(user=request.user)
         selected_user_id = str(request.user.id)
+        
+    queryset = queryset.filter(created_at__gte=now() - timedelta(days=90))
 
     total_applications = queryset.count()
     total_interviews = queryset.filter(status__name__icontains="Interview").count()
@@ -653,10 +656,11 @@ def get_applications_json(request):
     else:
         target_user = None  # All users (admin)
 
-    queryset = JobApplication.objects.all()
+    queryset = JobApplication.objects.only('id', 'user_id', 'created_at', 'status', 'job_title', 'company_name').select_related('status')
     if target_user:
         queryset = queryset.filter(user=target_user)
-
+    
+    queryset = queryset.filter(created_at__gte=now() - timedelta(days=90))
     jobs = (
         queryset
         .annotate(day=TruncDate('created_at'))
@@ -926,6 +930,7 @@ def interview_trend_data(request):
     if not request.user.is_staff:
         queryset = queryset.filter(caller=request.user)
 
+    queryset = queryset.filter(created_at__gte=now() - timedelta(days=90))
     trend = (
         queryset
         .annotate(date=TruncDate('created_at'))
