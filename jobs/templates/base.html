@@ -79,13 +79,27 @@
     <script>
         lucide.createIcons();
     </script>
+    <style>
+    #global-loading-spinner.fade-out {
+        opacity: 0;
+        transition: opacity 0.3s ease-out;
+        pointer-events: none;
+    }
+    </style>
+
     <script>
     window.addEventListener("load", function () {
         const spinner = document.getElementById("global-loading-spinner");
         if (spinner) {
-        spinner.style.display = "none";
+            setTimeout(() => {
+                spinner.classList.add("fade-out");
+                setTimeout(() => {
+                    spinner.style.display = "none";
+                }, 300); // Match the transition duration
+            }, 500); // Keep spinner visible for at least 500ms
         }
     });
     </script>
+
 </body>
 </html>
