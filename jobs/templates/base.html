@@ -104,18 +104,14 @@
     document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll("a").forEach(link => {
             link.addEventListener("click", function (e) {
-                const target = this.getAttribute("target");
-                const href = this.getAttribute("href");
-
-                if (
-                    href &&
-                    !href.startsWith("#") &&
-                    !href.startsWith("javascript:") &&
-                    !href.startsWith("mailto:") &&
-                    target !== "_blank"
-                ) {
-                    const spinner = document.getElementById("global-loading-spinner");
-                    if (spinner) spinner.style.display = "flex";
+                const spinner = document.getElementById("global-loading-spinner");
+                if (spinner) {
+                    e.preventDefault();
+                    spinner.style.display = "flex";
+                    const href = link.getAttribute("href");
+                    setTimeout(() => {
+                        window.location.href = href;
+                    }, 50);
                 }
             });
         });
