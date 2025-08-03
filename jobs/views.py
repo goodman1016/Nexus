@@ -90,7 +90,7 @@ def applications(request):
         search_status_raw = unquote_plus(request.GET.get('status', '').strip())
         search_status = search_status_raw.lower()
 
-        jobs = JobApplication.objects.select_related('user').prefetch_related(
+        base_queryset = JobApplication.objects.select_related('user').prefetch_related(
             Prefetch('callerrequest_set', queryset=CallerRequest.objects.filter(approved=True)),
             Prefetch('interviewproposal_set', queryset=InterviewProposal.objects.filter(approved=True)),
         ).annotate(
@@ -99,21 +99,39 @@ def applications(request):
 
         if request.user.is_staff or is_caller(request.user):
             if selected_user_id:
-                jobs = jobs.filter(user__id=selected_user_id)
-            else:
-                jobs = jobs  # show all
+                base_queryset = base_queryset.filter(user__id=selected_user_id)
         else:
-            jobs = jobs.filter(user=request.user)
+            base_queryset = base_queryset.filter(user=request.user)
 
         if search_title:
-            jobs = jobs.filter(job_title__icontains=search_title)
+            base_queryset = base_queryset.filter(job_title__icontains=search_title)
         if search_company:
-            jobs = jobs.filter(company_name__icontains=search_company)
+            base_queryset = base_queryset.filter(company_name__icontains=search_company)
 
-        # Delay filtering until after dynamic status assignment
-        filtered_jobs = []
+        total_count = base_queryset.count()
+
+        try:
+            page_size = int(request.GET.get('page_size', 10))
+        except ValueError:
+            page_size = 10
+
+        paginator = Paginator(base_queryset, page_size)
+
+        try:
+            page_number = int(request.GET.get('page', 1))
+        except ValueError:
+            page_number = 1
+
+        if page_number < 1:
+            page_number = 1
+        elif page_number > paginator.num_pages:
+            page_number = paginator.num_pages
+
+        page_obj = paginator.page(page_number)
+        jobs = list(page_obj.object_list)
+
+        final_jobs = []
         for job in jobs:
-            # Sum from both CallerRequest and InterviewProposal
             approved_reqs = job.callerrequest_set.all()
             approved_proposals = job.interviewproposal_set.all()
 
@@ -133,32 +151,27 @@ def applications(request):
                     score = prop.proposed_status.score
                     score_breakdown[label] += 1
                     total_score += score
-                    
-            # Set job._display_status from highest-ranked approved status (reqs or props)
+
             all_approved = list(approved_reqs) + list(approved_proposals)
             top_ranked = sorted(
                 (x for x in all_approved if x.proposed_status),
                 key=lambda x: x.proposed_status.rank,
                 reverse=True
             )
-            job._display_status = top_ranked[0].proposed_status if top_ranked else job.status
 
+            job._display_status = top_ranked[0].proposed_status if top_ranked else job.status
             job.total_score = total_score if total_score > 0 else 1.0
             job.score_tooltip = ", ".join(f"{k}: {v}" for k, v in score_breakdown.items()) if score_breakdown else "Applied"
 
             job_status_name = job._display_status.name.strip() if job._display_status else ''
             approved_status_names = {s.proposed_status.name.strip() for s in all_approved if s.proposed_status}
-
-            # Convert everything to lowercase for comparison
             job_status_name_lower = job_status_name.lower()
             approved_status_names_lower = {s.lower() for s in approved_status_names}
 
-            if search_status in ('', 'all'):
-                filtered_jobs.append(job)
-            elif search_status == job_status_name_lower or search_status in approved_status_names_lower:
-                filtered_jobs.append(job)
+            if search_status in ('', 'all') or search_status == job_status_name_lower or search_status in approved_status_names_lower:
+                final_jobs.append(job)
 
-        jobs = filtered_jobs
+        jobs = final_jobs
 
         sort_field = request.GET.get('sort', '')
         sort_order = request.GET.get('order', 'asc')
@@ -172,45 +185,15 @@ def applications(request):
         else:
             jobs.sort(key=lambda x: x.created_at, reverse=True)
 
-        try:
-            page_size = int(request.GET.get('page_size', 10))
-        except ValueError:
-            page_size = 10
-
-        # Dynamically evaluate best status from approved caller requests
-        status_rank_map = {
-            s.name: s.rank for s in ApplicationStatus.objects.all()
-        }
-
-        # 👇 Now paginate the modified list
-        paginator = Paginator(jobs, page_size)
-
-        try:
-            page_number = int(request.GET.get('page', 1))
-        except ValueError:
-            page_number = 1
-
-        if page_number < 1:
-            page_number = 1
-        elif page_number > paginator.num_pages:
-            page_number = paginator.num_pages
-
-        page_obj = paginator.page(page_number)
-
-        caller_flag = is_caller(request.user)
-        
         # Accurate user_score calculation
         if request.user.is_staff:
-            user_score = None  # Admins don't see score
+            user_score = None
         else:
-            # Only non-admin users see their own unpaid score
             user_jobs = JobApplication.objects.filter(user=request.user, payment_status="unpaid").select_related('user')
-            
             user_score = 0
             for job in user_jobs:
                 approved_reqs = CallerRequest.objects.filter(application=job, approved=True)
                 approved_props = InterviewProposal.objects.filter(application=job, approved=True)
-
                 total_score = 0
                 for req in approved_reqs:
                     if req.proposed_status:
@@ -218,7 +201,6 @@ def applications(request):
                 for prop in approved_props:
                     if prop.proposed_status:
                         total_score += prop.proposed_status.score
-
                 user_score += total_score if total_score > 0 else 1.0
 
         all_users = User.objects.all() if request.user.is_staff else None
@@ -235,11 +217,14 @@ def applications(request):
             'selected_user_id': int(selected_user_id) if selected_user_id else '',
             'is_admin': request.user.is_superuser,
             'all_users': all_users,
-            'is_caller': caller_flag,
+            'is_caller': is_caller(request.user),
             'is_contributor': is_contributor_flag,
             'is_admin': is_admin,
             'all_statuses': all_statuses,
             'interview_statuses': interview_statuses,
+            'jobs': jobs,  # filtered and decorated jobs
+            'total_pages': paginator.num_pages,
+            'total_count': total_count,
         })
         
     if request.method == 'POST':
