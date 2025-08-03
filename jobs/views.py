@@ -90,48 +90,63 @@ def applications(request):
         search_status_raw = unquote_plus(request.GET.get('status', '').strip())
         search_status = search_status_raw.lower()
 
-        base_queryset = JobApplication.objects.select_related('user').prefetch_related(
+        # Base queryset with related and prefetch to minimize queries
+        jobs_qs = JobApplication.objects.select_related('user').prefetch_related(
             Prefetch('callerrequest_set', queryset=CallerRequest.objects.filter(approved=True)),
             Prefetch('interviewproposal_set', queryset=InterviewProposal.objects.filter(approved=True)),
         ).annotate(
             approved_call_count=Count('callerrequest', filter=Q(callerrequest__approved=True))
         )
 
+        # Apply user-based filtering
         if request.user.is_staff or is_caller(request.user):
             if selected_user_id:
-                base_queryset = base_queryset.filter(user__id=selected_user_id)
+                jobs_qs = jobs_qs.filter(user__id=selected_user_id)
+            # else show all
         else:
-            base_queryset = base_queryset.filter(user=request.user)
+            jobs_qs = jobs_qs.filter(user=request.user)
 
+        # Apply search filters
         if search_title:
-            base_queryset = base_queryset.filter(job_title__icontains=search_title)
+            jobs_qs = jobs_qs.filter(job_title__icontains=search_title)
         if search_company:
-            base_queryset = base_queryset.filter(company_name__icontains=search_company)
+            jobs_qs = jobs_qs.filter(company_name__icontains=search_company)
 
-        total_count = base_queryset.count()
+        # **Important: get total count here for pagination metadata**
+        total_count = jobs_qs.count()
 
+        # **Apply sorting on the queryset only for fields that exist at DB level**
+        sort_field = request.GET.get('sort', '')
+        sort_order = request.GET.get('order', 'asc')
+        valid_fields = ['job_title', 'company_name', 'job_url', 'created_at', 'status']
+        if sort_field in valid_fields and sort_field != 'status':
+            order_prefix = '-' if sort_order == 'desc' else ''
+            jobs_qs = jobs_qs.order_by(f"{order_prefix}{sort_field}")
+        else:
+            # We'll do status and default sorting later in Python for paged subset
+            jobs_qs = jobs_qs.order_by('-created_at')
+
+        # Pagination: get page_size & page_number
         try:
             page_size = int(request.GET.get('page_size', 10))
         except ValueError:
             page_size = 10
-
-        paginator = Paginator(base_queryset, page_size)
 
         try:
             page_number = int(request.GET.get('page', 1))
         except ValueError:
             page_number = 1
 
-        if page_number < 1:
-            page_number = 1
-        elif page_number > paginator.num_pages:
-            page_number = paginator.num_pages
+        # Calculate offset and limit for slicing
+        start = (page_number - 1) * page_size
+        end = start + page_size
 
-        page_obj = paginator.page(page_number)
-        jobs = list(page_obj.object_list)
+        # **Fetch only current page's jobs from DB**
+        jobs_page = list(jobs_qs[start:end])
 
-        final_jobs = []
-        for job in jobs:
+        # Now, apply status/score calculations **only on this page subset**
+        filtered_jobs = []
+        for job in jobs_page:
             approved_reqs = job.callerrequest_set.all()
             approved_proposals = job.interviewproposal_set.all()
 
@@ -158,42 +173,54 @@ def applications(request):
                 key=lambda x: x.proposed_status.rank,
                 reverse=True
             )
-
             job._display_status = top_ranked[0].proposed_status if top_ranked else job.status
             job.total_score = total_score if total_score > 0 else 1.0
             job.score_tooltip = ", ".join(f"{k}: {v}" for k, v in score_breakdown.items()) if score_breakdown else "Applied"
 
             job_status_name = job._display_status.name.strip() if job._display_status else ''
             approved_status_names = {s.proposed_status.name.strip() for s in all_approved if s.proposed_status}
+
             job_status_name_lower = job_status_name.lower()
             approved_status_names_lower = {s.lower() for s in approved_status_names}
 
-            if search_status in ('', 'all') or search_status == job_status_name_lower or search_status in approved_status_names_lower:
-                final_jobs.append(job)
+            # Filter by status search param here (only within this page subset)
+            if search_status in ('', 'all'):
+                filtered_jobs.append(job)
+            elif search_status == job_status_name_lower or search_status in approved_status_names_lower:
+                filtered_jobs.append(job)
 
-        jobs = final_jobs
-
-        sort_field = request.GET.get('sort', '')
-        sort_order = request.GET.get('order', 'asc')
-        valid_fields = ['job_title', 'company_name', 'job_url', 'created_at', 'status']
-        if sort_field in valid_fields:
+        # For status sorting, which can't be done at DB level, sort filtered_jobs here
+        if sort_field == 'status':
             reverse = sort_order == 'desc'
-            if sort_field == 'status':
-                jobs.sort(key=lambda x: getattr(x._display_status, 'rank', 0), reverse=reverse)
-            else:
-                jobs.sort(key=lambda x: getattr(x, sort_field, ''), reverse=reverse)
-        else:
-            jobs.sort(key=lambda x: x.created_at, reverse=True)
+            filtered_jobs.sort(key=lambda x: getattr(x._display_status, 'rank', 0), reverse=reverse)
 
-        # Accurate user_score calculation
+        jobs = filtered_jobs
+
+        # Recreate Paginator with the total count and page size (not the whole jobs list)
+        paginator = Paginator(range(total_count), page_size)  # Dummy paginator for metadata
+
+        # Correct page_number if out of range
+        if page_number < 1:
+            page_number = 1
+        elif page_number > paginator.num_pages:
+            page_number = paginator.num_pages
+
+        page_obj = paginator.page(page_number)
+        page_obj.object_list = jobs  # override page objects with processed jobs list
+
+        # The rest of your code for user_score, flags, etc, can remain unchanged
+        caller_flag = is_caller(request.user)
+
         if request.user.is_staff:
             user_score = None
         else:
             user_jobs = JobApplication.objects.filter(user=request.user, payment_status="unpaid").select_related('user')
+
             user_score = 0
             for job in user_jobs:
                 approved_reqs = CallerRequest.objects.filter(application=job, approved=True)
                 approved_props = InterviewProposal.objects.filter(application=job, approved=True)
+
                 total_score = 0
                 for req in approved_reqs:
                     if req.proposed_status:
@@ -201,6 +228,7 @@ def applications(request):
                 for prop in approved_props:
                     if prop.proposed_status:
                         total_score += prop.proposed_status.score
+
                 user_score += total_score if total_score > 0 else 1.0
 
         all_users = User.objects.all() if request.user.is_staff else None
@@ -217,14 +245,11 @@ def applications(request):
             'selected_user_id': int(selected_user_id) if selected_user_id else '',
             'is_admin': request.user.is_superuser,
             'all_users': all_users,
-            'is_caller': is_caller(request.user),
+            'is_caller': caller_flag,
             'is_contributor': is_contributor_flag,
             'is_admin': is_admin,
             'all_statuses': all_statuses,
             'interview_statuses': interview_statuses,
-            'jobs': jobs,  # filtered and decorated jobs
-            'total_pages': paginator.num_pages,
-            'total_count': total_count,
         })
         
     if request.method == 'POST':
