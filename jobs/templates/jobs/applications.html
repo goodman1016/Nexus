@@ -207,13 +207,19 @@
                         <!-- Pagination + Rows per page -->
                         <div class="flex items-center flex-wrap gap-2">
                             <!-- Pagination Controls -->
-                            <a href="?page={% if page_obj.has_previous %}{{ page_obj.previous_page_number }}{% else %}{{ page_obj.number }}{% endif %}&page_size={{ page_size }}{% if showing_mine %}&mine=1{% endif %}"
-                                class="px-3 py-1 rounded border border-gray-300
-                                {% if not page_obj.has_previous %}
-                                    bg-gray-200 text-gray-400 cursor-not-allowed pointer-events-none
-                                {% else %}
-                                    bg-gray-100 hover:bg-gray-200
-                                {% endif %}">
+                            <a href="?page={% if page_obj.has_previous %}{{ page_obj.previous_page_number }}{% else %}{{ page_obj.number }}{% endif %}
+                            &page_size={{ page_size }}
+                            {% if showing_mine %}&mine=1{% endif %}
+                            {% if request.GET.job_title %}&job_title={{ request.GET.job_title|urlencode }}{% endif %}
+                            {% if request.GET.company_name %}&company_name={{ request.GET.company_name|urlencode }}{% endif %}
+                            {% if request.GET.status %}&status={{ request.GET.status|urlencode }}{% endif %}
+                            {% if selected_user_id %}&user_id={{ selected_user_id }}{% endif %}"
+                            class="px-3 py-1 rounded border border-gray-300
+                            {% if not page_obj.has_previous %}
+                                bg-gray-200 text-gray-400 cursor-not-allowed pointer-events-none
+                            {% else %}
+                                bg-gray-100 hover:bg-gray-200
+                            {% endif %}">
                                 « Prev
                             </a>
 
@@ -223,15 +229,36 @@
                                     value="{{ page_obj.number }}" class="w-16 border border-gray-300 rounded px-2 py-1 text-sm" />
                                 <span>of {{ page_obj.paginator.num_pages }}</span>
                                 <input type="hidden" name="page_size" value="{{ page_size }}">
+                                {% if showing_mine %}
+                                    <input type="hidden" name="mine" value="1">
+                                {% endif %}
+                                {% if request.GET.job_title %}
+                                    <input type="hidden" name="job_title" value="{{ request.GET.job_title }}">
+                                {% endif %}
+                                {% if request.GET.company_name %}
+                                    <input type="hidden" name="company_name" value="{{ request.GET.company_name }}">
+                                {% endif %}
+                                {% if request.GET.status %}
+                                    <input type="hidden" name="status" value="{{ request.GET.status }}">
+                                {% endif %}
+                                {% if selected_user_id %}
+                                    <input type="hidden" name="user_id" value="{{ selected_user_id }}">
+                                {% endif %}
                             </form>
 
-                            <a href="?page={% if page_obj.has_next %}{{ page_obj.next_page_number }}{% else %}{{ page_obj.number }}{% endif %}&page_size={{ page_size }}{% if showing_mine %}&mine=1{% endif %}"
-                                class="px-3 py-1 rounded border border-gray-300
-                                {% if not page_obj.has_next %}
-                                    bg-gray-200 text-gray-400 cursor-not-allowed pointer-events-none
-                                {% else %}
-                                    bg-gray-100 hover:bg-gray-200
-                                {% endif %}">
+                            <a href="?page={% if page_obj.has_next %}{{ page_obj.next_page_number }}{% else %}{{ page_obj.number }}{% endif %}
+                            &page_size={{ page_size }}
+                            {% if showing_mine %}&mine=1{% endif %}
+                            {% if request.GET.job_title %}&job_title={{ request.GET.job_title|urlencode }}{% endif %}
+                            {% if request.GET.company_name %}&company_name={{ request.GET.company_name|urlencode }}{% endif %}
+                            {% if request.GET.status %}&status={{ request.GET.status|urlencode }}{% endif %}
+                            {% if selected_user_id %}&user_id={{ selected_user_id }}{% endif %}"
+                            class="px-3 py-1 rounded border border-gray-300
+                            {% if not page_obj.has_next %}
+                                bg-gray-200 text-gray-400 cursor-not-allowed pointer-events-none
+                            {% else %}
+                                bg-gray-100 hover:bg-gray-200
+                            {% endif %}">
                                 Next »
                             </a>
 
