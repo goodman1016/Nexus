@@ -106,7 +106,12 @@
             link.addEventListener("click", function (e) {
                 const spinner = document.getElementById("global-loading-spinner");
                 if (spinner) {
+                    e.preventDefault();
                     spinner.style.display = "flex";
+                    const href = link.getAttribute("href");
+                    setTimeout(() => {
+                        window.location.href = href;
+                    }, 50);
                 }
             });
         });
