@@ -368,6 +368,9 @@ def application_heatmap_data(request):
         for d in data
     ], safe=False)
 
+from django.utils.timezone import now
+from datetime import timedelta
+
 @login_required
 def get_job_status_counts(request):
     approval_check = check_approval(request)
@@ -376,6 +379,7 @@ def get_job_status_counts(request):
 
     user_id = request.GET.get("user_id") or None
 
+    # Determine target_user
     if request.user.is_superuser and user_id:
         target_user = get_object_or_404(User, id=user_id)
     elif not request.user.is_superuser:
@@ -383,36 +387,51 @@ def get_job_status_counts(request):
     else:
         target_user = None  # All users
 
-    queryset = JobApplication.objects.only('id', 'user_id', 'created_at', 'status', 'job_title', 'company_name').select_related('status')
+    # Base queryset
+    queryset = JobApplication.objects.only(
+        'id', 'user_id', 'created_at', 'status', 'job_title', 'company_name'
+    ).select_related('status')
+
     if target_user:
         queryset = queryset.filter(user=target_user)
-    
+
     queryset = queryset.filter(created_at__gte=now() - timedelta(days=90))
+
+    # Prefetch related CallerRequests (approved with proposed_status)
+    queryset = queryset.prefetch_related(
+        Prefetch(
+            'callerrequest_set',
+            queryset=CallerRequest.objects.filter(
+                approved=True,
+                proposed_status__isnull=False
+            ).select_related('proposed_status'),
+            to_attr='approved_requests'
+        )
+    )
+
     counts = {'applied': 0, 'interview': 0, 'offer': 0, 'rejected': 0}
 
-    # Build a lookup for ranks
+    # Build lookup for ranks
     rank_map = {
         status.id: status.rank for status in ApplicationStatus.objects.all()
     }
-    label_map = {
-        "applied": "applied",
-        "offer": "offer",
-        "rejected": "rejected"
-    }
 
     for job in queryset:
-        # Get highest ranked approved request
-        approved_reqs = CallerRequest.objects.filter(application=job, approved=True, proposed_status__isnull=False)
+        approved_reqs = job.approved_requests  # Now attached by prefetch
 
-        if approved_reqs.exists():
-            top_req = sorted(approved_reqs, key=lambda r: rank_map.get(r.proposed_status.id, 0), reverse=True)[0]
+        if approved_reqs:
+            top_req = sorted(
+                approved_reqs,
+                key=lambda r: rank_map.get(r.proposed_status.id, 0),
+                reverse=True
+            )[0]
             status_name = top_req.proposed_status.name.lower()
         elif job.status:
             status_name = job.status.name.lower()
         else:
             status_name = "applied"  # fallback
 
-        # Map status_name to one of four labels
+        # Map to one of four labels
         if "applied" in status_name:
             counts["applied"] += 1
         elif "offer" in status_name:
